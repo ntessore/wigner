@@ -10,10 +10,10 @@ endif
 
 .PHONY: all clean
 
-all: wigner_d.so
+all: _wigner_d.so
 
 clean:
-	$(RM) wigner_d.so
+	$(RM) _wigner_d.so
 
-wigner_d.so: wigner_d.c
+_wigner_d.so: wigner_d.c
 	$(CC) -shared $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -o $@ $^ $(LDLIBS)

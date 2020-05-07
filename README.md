@@ -13,9 +13,7 @@ To use:
     $ git clone https://github.com/ntessore/pywigner_d.git
     $ cd pywigner_d
     $ # compile the C code
-    $ cd wigner_d
     $ make
-    $ cd ..
     $ # run a simple test
     $ python test.py
     [0.         0.         0.9950104  0.98009768 0.96038789 0.93602817

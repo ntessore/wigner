@@ -3,7 +3,7 @@ import ctypes as ct
 import numpy.ctypeslib as ctl
 import os.path
 
-dll = os.path.join(os.path.dirname(__file__), 'wigner_d.so')
+dll = os.path.join(os.path.dirname(__file__), '_wigner_d.so')
 lib = ct.cdll.LoadLibrary(dll)
 lib.wigner_d.restype
 lib.wigner_d.argtypes = [

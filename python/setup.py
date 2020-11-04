@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='wigner',
-    version='0.9.0',
+    version='0.9.1',
     author='Nicolas Tessore',
     author_email='n.tessore@ucl.ac.uk',
     description='functions for rotations: Wigner D-matrix, 3j-symbols',
@@ -18,10 +18,13 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     python_requires='>=3.6',
-    include_dirs=['../c'],
+    packages=['wigner'],
     ext_modules=[
-        setuptools.Extension('wigner', [
-            'module.c', '../c/wigner_d_l.c'
+        setuptools.Extension('wigner.c', [
+            'src/wigner.c',
+            '../c/wigner_3j_l.c',
+            '../c/wigner_d_l.c',
         ])
     ],
+    include_dirs=['../c'],
 )

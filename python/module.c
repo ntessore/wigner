@@ -1,9 +1,9 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-extern void wigner_d(int l0, int l1, int n, int m, double theta, double* d);
+#include "wigner_d.h"
 
-static PyObject* _wigner_d(PyObject* self, PyObject* args)
+static PyObject* pywigner_d(PyObject* self, PyObject* args)
 {
     int l0, l1, n, m;
     PyObject* angle;
@@ -78,7 +78,7 @@ static PyObject* _wigner_d(PyObject* self, PyObject* args)
 }
 
 static PyMethodDef methods[] = {
-    {"wigner_d", _wigner_d, METH_VARARGS,
+    {"wigner_d", pywigner_d, METH_VARARGS,
      "wigner_d(l0, l1, n, m, angle, /)\n--\n\nWigner D-function for range l = "
      "l0, ..., l1 and n, m, angle [rad] fixed. If a single angle is given, the "
      "Wigner (little) d-function is computed, and a list of real numbers is "

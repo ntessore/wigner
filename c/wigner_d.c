@@ -1,9 +1,12 @@
-// wigner_d.c -- compute the Wigner d-matrix recursively in angular momentum
+// wigner_d.c -- compute the Wigner d-function recursively in angular momentum
 // ----
-// author: Nicolas Tessore <nicolas.tessore@manchester.ac.uk>
-// date: 31 Aug 2018
-// ----
-// uses SSE intrinsics by default if SSE3 is detected; disabled with -DNO_SSE
+// author: Nicolas Tessore <n.tessore@ucl.ac.uk>
+// versions:
+//   31 Aug 2018: initial version
+//   04 Nov 2020: packaged, code unchanged
+// notes:
+// - uses SSE intrinsics by default if SSE3 is detected; compile with -DNO_SSE
+//   to disable
 
 #include <stdlib.h>
 #include <math.h>

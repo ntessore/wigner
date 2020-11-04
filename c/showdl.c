@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "wigner_d.h"
+#include "wigner.h"
 
 int main(int argc, char* argv[])
 {
@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     
     if(argc != 6)
     {
-        fprintf(stderr, "usage: showdl l0 l1 m' m theta\n");
+        fprintf(stderr, "usage: showdl lmin lmax m1 m2 theta\n");
         return EXIT_FAILURE;
     }
     
@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     
     if(l1 < l0)
     {
-        fprintf(stderr, "range error: l0 <= l1 is required\n");
+        fprintf(stderr, "range error: lmax <= lmin is required\n");
         return EXIT_FAILURE;
     }
     
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    wigner_d(l0, l1, n, m, 0.017453292519943295769*t, d);
+    wigner_d_l(l0, l1, n, m, 0.017453292519943295769*t, d);
     
     printf("#    l  d^l_{%d, %d}(%g deg)\n", n, m, t);
     for(l = l0; l <= l1; ++l)

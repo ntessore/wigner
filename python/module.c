@@ -1,17 +1,17 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-#include "wigner_d.h"
+#include "wigner.h"
 
-static PyObject* pywigner_d(PyObject* self, PyObject* args)
+static PyObject* pywigner_d_l(PyObject* self, PyObject* args)
 {
-    int l0, l1, n, m;
+    int lmin, lmax, m1, m2, i, n;
     PyObject* angle;
     double phi, theta, gamma;
     double* d;
     PyObject* list;
 
-    if(!PyArg_ParseTuple(args, "iiiiO", &l0, &l1, &n, &m, &angle))
+    if(!PyArg_ParseTuple(args, "iiiiO", &lmin, &lmax, &m1, &m2, &angle))
         return NULL;
 
     if(PyFloat_Check(angle))
@@ -45,31 +45,32 @@ static PyObject* pywigner_d(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    if(l0 < 0 || l1 < l0)
+    if(lmin < 0 || lmax < lmin)
     {
-        PyErr_SetString(PyExc_ValueError, "requires 0 <= l0 <= l1");
+        PyErr_SetString(PyExc_ValueError, "requires 0 <= lmin <= lmax");
         return NULL;
     }
 
-    d = malloc((l1-l0+1)*sizeof(double));
+    n = lmax-lmin+1;
+    d = malloc(n*sizeof(double));
     if(!d)
         return PyErr_NoMemory();
 
-    wigner_d(l0, l1, n, m, theta, d);
+    wigner_d_l(lmin, lmax, m1, m2, theta, d);
 
-    list = PyList_New(l1-l0+1);
+    list = PyList_New(n);
     if(phi == HUGE_VAL)
     {
-        for(l1 = l1-l0+1, l0=0; l0 < l1; ++l0)
-            PyList_SetItem(list, l0, PyFloat_FromDouble(d[l0]));
+        for(i = 0; i < n; ++i)
+            PyList_SetItem(list, i, PyFloat_FromDouble(d[i]));
     }
     else
     {
-        const double a = n*phi + m*gamma;
+        const double a = m1*phi + m2*gamma;
         const double c = cos(a);
         const double s = sin(a);
-        for(l1 = l1-l0+1, l0=0; l0 < l1; ++l0)
-            PyList_SetItem(list, l0, PyComplex_FromDoubles(c*d[l0], s*d[l0]));
+        for(i = 0; i < n; ++i)
+            PyList_SetItem(list, i, PyComplex_FromDoubles(c*d[i], s*d[i]));
     }
 
     free(d);
@@ -78,27 +79,28 @@ static PyObject* pywigner_d(PyObject* self, PyObject* args)
 }
 
 static PyMethodDef methods[] = {
-    {"wigner_d", pywigner_d, METH_VARARGS,
-     "wigner_d(l0, l1, n, m, angle, /)\n--\n\nWigner D-function for range l = "
-     "l0, ..., l1 and n, m, angle [rad] fixed. If a single angle is given, the "
-     "Wigner (little) d-function is computed, and a list of real numbers is "
-     "returned. If a tuple (phi, theta, gamma) of angles is given, the Wigner "
-     "(big) D-function is computed, and a list of complex numbers is returned. "
-     "The rotation in matrix form is R_z(phi)*R_y(theta)*R_z(gamma)."
+    {"wigner_d_l", pywigner_d_l, METH_VARARGS,
+     "wigner_d_l(lmin, lmax, m1, m2, angle, /)\n--\n\nWigner D-function for "
+     "range l = lmin, ..., lmax and m1, m2, angle [rad] fixed. If a single "
+     "angle is given, the Wigner (little) d-function is computed, and a list "
+     "of real numbers is returned. If a tuple (phi, theta, gamma) of angles "
+     "is given, the Wigner (big) D-function is computed, and a list of complex "
+     "numbers is returned. The rotation in matrix form is "
+     "R_z(phi)*R_y(theta)*R_z(gamma)."
     },
     {NULL, NULL, 0, NULL}
 };
 
 static struct PyModuleDef module = {
     PyModuleDef_HEAD_INIT,
-    "wigner_d",
+    "wigner",
     NULL,
     -1,
     methods
 };
 
 PyMODINIT_FUNC
-PyInit_wigner_d(void)
+PyInit_wigner(void)
 {
     return PyModule_Create(&module);
 }

@@ -56,7 +56,7 @@ void legendre_p(double x, int n0, int n1, double* p)
     }
 }
 
-void wigner_d(int l0, int l1, int n, int m, double theta, double* d)
+void wigner_d_l(int l0, int l1, int n, int m, double theta, double* d)
 {
     double d0, u, v, x;
     int l, lp, a, b, c;

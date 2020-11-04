@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "wigner_d.h"
+#include "wigner.h"
 
 #ifndef LINELEN
 #define LINELEN 1024
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     
     if(argc < 8 || argc > 9)
     {
-        fprintf(stderr, "usage: cl_to_xi l0 l1 m1 m2 th0 th1 nth [file]\n");
+        fprintf(stderr, "usage: cl_to_xi lmin lmax m1 m2 th0 th1 nth [file]\n");
         return EXIT_FAILURE;
     }
     
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     
     if(l0 < 0 || l1 < l0)
     {
-        fprintf(stderr, "error: 0 <= l0 <= l1 required\n");
+        fprintf(stderr, "error: 0 <= lmin <= lmax required\n");
         return EXIT_FAILURE;
     }
     
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
     {
         t = t0 + d*i;
         
-        wigner_d(l0, l1, m1, m2, 0.017453292519943295769*t, wd);
+        wigner_d_l(l0, l1, m1, m2, 0.017453292519943295769*t, wd);
         
         x = 0;
         for(l = l0; l <= l1; ++l)

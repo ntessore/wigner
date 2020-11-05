@@ -29,13 +29,24 @@ Wigner 3j-symbols
 
 ### `wigner_3j_l`
 
-Evaluate the 3j symbol
+Evaluate the Wigner 3j-symbol
 
     f(l1) = (  l1   l2 l3)
             (-m2-m3 m2 m3)
 
 for all allowed values of `l1`, the other parameters being held fixed. The code
 is a translation of the [SLATEC] function `drc3jj` to C.
+
+
+### `wigner_3j_m`
+
+Evaluate the Wigner 3j-symbol
+
+    g(m2) = (l1 l2   l3  )
+            (m1 m2 -m1-m2)
+
+for all allowed values of `m2`, the other parameters being held fixed. The code
+is a translation of the [SLATEC] function `drc3jm` to C.
 
 
 <!-- References -->

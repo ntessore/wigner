@@ -1,4 +1,5 @@
 CFLAGS += -std=c99 -Wall -Wextra -Werror -Wno-unknown-pragmas -pedantic
+CFLAGS += -I../src
 LDFLAGS += 
 LDLIBS += -lm
 
@@ -15,8 +16,8 @@ all: cl_to_xi showdl
 clean:
 	$(RM) cl_to_xi showdl
 
-cl_to_xi: cl_to_xi.c wigner_d_l.c
+cl_to_xi: cl_to_xi.c ../src/wigner_d_l.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -o $@ $^ $(LDLIBS)
 
-showdl: showdl.c wigner_d_l.c
+showdl: showdl.c ../src/wigner_d_l.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -o $@ $^ $(LDLIBS)

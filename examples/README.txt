@@ -1,15 +1,3 @@
-This repository contains a fast routine in C to compute the Wigner d-matrix for
-a range of angular momentum values l and fixed m. This is done via a recurrence
-in l, which is described in https://arxiv.org/abs/1904.09973.
-
-To use the routine, simply copy the `wigner_d.c` source file into your project,
-and let your code know about the new function by including the `wigner_d.h`
-header, or by putting
-
-    extern void wigner_d(int l0, int l1, int m, int k, double x, double* d);
-
-near the top of your source.
-
 Included here is a program `cl_to_xi` that converts power spectra C_l to the
 two-point functions xi(theta) for generic spin-n random fields on the sphere.
 

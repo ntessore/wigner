@@ -5,12 +5,12 @@ wigner
 
 A collection of fast numerical routines in C to compute functions associated
 with rotations and statistics on the sphere. Hand-coded and dependency-free
-Python interfaces are provided.
+Python interfaces are provided in the [pywigner] repository.
 
-Interfaces:
+Functions:
 
-- [C](c/)
-- [Python](python/)
+- [Wigner D-matrix](#wigner-d-matrix)
+- [Wigner 3j-symbols](#wigner-3j-symbols)
 
 
 Wigner D-matrix
@@ -19,11 +19,9 @@ Wigner D-matrix
 ### `wigner_d_l`
 
 Code to compute the Wigner D-function for a range of `l` values and fixed `m`
-and angle, using the recurrence described in [`arXiv:1904.09973`]. The code is
+and angle, using the recurrence described in [arXiv:1904.09973]. The code is
 written in C and by default uses SSE intrinsics to speed up the computation,
 although this can be turned off on compilation.
-
-[`arXiv:1904.09973`]: https://arxiv.org/abs/1904.09973
 
 
 Wigner 3j-symbols
@@ -39,4 +37,9 @@ Evaluate the 3j symbol
 for all allowed values of `l1`, the other parameters being held fixed. The code
 is a translation of the [SLATEC] function `drc3jj` to C.
 
+
+<!-- References -->
+
+[arXiv:1904.09973]: https://arxiv.org/abs/1904.09973
+[pywigner]: https://github.com/ntessore/pywigner
 [SLATEC]: http://www.netlib.org/slatec

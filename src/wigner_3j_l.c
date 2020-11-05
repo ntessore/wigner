@@ -22,7 +22,7 @@
 // Usage
 // -----
 // int wigner_3j_l(double l2, double l3, double m2, double m3, double* l1min,
-//                 double* l1max, double* thrcof);
+//                 double* l1max, double* thrcof, int ndim);
 //
 // Arguments
 // ---------
@@ -45,6 +45,9 @@
 //     If `thrcof` is `NULL`, the function will return after `l1min` and
 //     `l1max` are set, so that an array of the correct size can be allocated
 //     for a subsequent function call..
+// ndim : int
+//     Declared length of `thrcof` in calling program. If `thrcof` is `NULL`,
+//     then `ndim` should be set to 0.
 //
 // Returns
 // -------
@@ -55,6 +58,7 @@
 //     ier=2 Either `l2+abs(m2)` or `l3+abs(m3)` non-integer.
 //     ier=3 `l1max-l1min` not an integer.
 //     ier=4 `l1max` less than `l1min`.
+//     ier=5 `ndim` less than `l1max-l1min+1`.
 //
 // Description
 // -----------
@@ -137,7 +141,7 @@ inline int phase(int m)
 }
 
 int wigner_3j_l(double l2, double l3, double m2, double m3, double* l1min_out,
-                double* l1max_out, double* thrcof)
+                double* l1max_out, double* thrcof, int ndim)
 {
     // variables
     int i, index, lstep, n, nfin, nfinp1, nfinp2, nlim, nstep2;
@@ -185,6 +189,10 @@ int wigner_3j_l(double l2, double l3, double m2, double m3, double* l1min_out,
 
     // Number of coefficients to compute.
     nfin = l1max-l1min+1+eps;
+
+    // Check error condition 5.
+    if(ndim < nfin)
+        return 5;
 
     // Check whether l1 can take only one value, ie. l1min = l1max.
     if(l1min >= l1max-eps)

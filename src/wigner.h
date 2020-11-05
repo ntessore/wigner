@@ -5,4 +5,4 @@ void legendre_p(double x, int lmin, int lmax, double* p);
 void wigner_d_l(int lmin, int lmax, int m1, int m2, double theta, double* d);
 
 int wigner_3j_l(double l2, double l3, double m2, double m3, double* l1min,
-                double* l1max, double* thrcof);
+                double* l1max, double* thrcof, int ndim);

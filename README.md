@@ -16,6 +16,10 @@ Functions:
 Wigner D-matrix
 ---------------
 
+- [`wigner_d_l`](#wigner_d_l)
+  compute the Wigner D-function for a range of `l` values
+
+
 ### `wigner_d_l`
 
 Code to compute the Wigner D-function for a range of `l` values and fixed `m`
@@ -26,6 +30,12 @@ although this can be turned off on compilation.
 
 Wigner 3j-symbols
 -----------------
+
+- [`wigner_3j_l`](#wigner_3j_l)
+  evaluate the Wigner 3j-symbol for all allowed values of `l1`
+- [`wigner_3j_m`](#wigner_3j_m)
+  evaluate the Wigner 3j-symbol for all allowed values of `m2`
+
 
 ### `wigner_3j_l`
 

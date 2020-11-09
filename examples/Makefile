@@ -1,5 +1,5 @@
 CFLAGS += -std=c99 -Wall -Wextra -Werror -Wno-unknown-pragmas -pedantic
-CFLAGS += -I../src
+CFLAGS += -I../include
 LDFLAGS += 
 LDLIBS += -lm
 

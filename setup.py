@@ -5,7 +5,7 @@ with open('README.rst', 'r') as fh:
 
 setuptools.setup(
     name='wigner',
-    version='0.9.3',
+    version='0.9.4',
     author='Nicolas Tessore',
     author_email='n.tessore@ucl.ac.uk',
     description='functions for rotations: Wigner D-matrix, 3j-symbols',

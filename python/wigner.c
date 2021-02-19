@@ -11,6 +11,7 @@ static PyObject* c_wigner_3j_l(PyObject* self, PyObject* args)
     int ier, i, n;
 
     PyObject* list;
+    PyObject* result;
 
     if(!PyArg_ParseTuple(args, "dddd", &l2, &l3, &m2, &m3))
         return NULL;
@@ -58,11 +59,11 @@ static PyObject* c_wigner_3j_l(PyObject* self, PyObject* args)
 
     free(thrcof);
 
-    return PyTuple_Pack(3,
-        PyFloat_FromDouble(l1min),
-        PyFloat_FromDouble(l1max),
-        list
-    );
+    result = Py_BuildValue("ddO", l1min, l1max, list);
+
+    Py_DECREF(list);
+
+    return result;
 }
 
 
@@ -73,6 +74,7 @@ static PyObject* c_wigner_3j_m(PyObject* self, PyObject* args)
     int ier, i, n;
 
     PyObject* list;
+    PyObject* result;
 
     if(!PyArg_ParseTuple(args, "dddd", &l1, &l2, &l3, &m1))
         return NULL;
@@ -124,11 +126,11 @@ static PyObject* c_wigner_3j_m(PyObject* self, PyObject* args)
 
     free(thrcof);
 
-    return PyTuple_Pack(3,
-        PyFloat_FromDouble(m2min),
-        PyFloat_FromDouble(m2max),
-        list
-    );
+    result = Py_BuildValue("ddO", m2min, m2max, list);
+
+    Py_DECREF(list);
+
+    return result;
 }
 
 

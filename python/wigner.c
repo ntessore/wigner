@@ -1,17 +1,25 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
+#include <numpy/arrayobject.h>
 
 #include "wigner.h"
+
+
+void capsule_free(PyObject* capsule)
+{
+    void* p = PyCapsule_GetPointer(capsule, NULL);
+    free(p);
+}
 
 
 static PyObject* c_wigner_3j_l(PyObject* self, PyObject* args)
 {
     double l2, l3, m2, m3, l1min, l1max;
     double* thrcof;
-    int ier, i, n;
-
-    PyObject* list;
-    PyObject* result;
+    int ier, n;
+    npy_intp dims[1];
+    PyObject* array;
+    PyObject* capsule;
 
     if(!PyArg_ParseTuple(args, "dddd", &l2, &l3, &m2, &m3))
         return NULL;
@@ -53,17 +61,12 @@ static PyObject* c_wigner_3j_l(PyObject* self, PyObject* args)
 
     wigner_3j_l(l2, l3, m2, m3, &l1min, &l1max, thrcof, n);
 
-    list = PyList_New(n);
-    for(i = 0; i < n; ++i)
-        PyList_SetItem(list, i, PyFloat_FromDouble(thrcof[i]));
+    dims[0] = n;
+    array = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, thrcof);
+    capsule = PyCapsule_New(thrcof, NULL, capsule_free);
+    PyArray_SetBaseObject((PyArrayObject*)array, capsule);
 
-    free(thrcof);
-
-    result = Py_BuildValue("ddO", l1min, l1max, list);
-
-    Py_DECREF(list);
-
-    return result;
+    return Py_BuildValue("ddN", l1min, l1max, array);
 }
 
 
@@ -71,10 +74,10 @@ static PyObject* c_wigner_3j_m(PyObject* self, PyObject* args)
 {
     double l1, l2, l3, m1, m2min, m2max;
     double* thrcof;
-    int ier, i, n;
-
-    PyObject* list;
-    PyObject* result;
+    int ier, n;
+    npy_intp dims[1];
+    PyObject* array;
+    PyObject* capsule;
 
     if(!PyArg_ParseTuple(args, "dddd", &l1, &l2, &l3, &m1))
         return NULL;
@@ -120,17 +123,12 @@ static PyObject* c_wigner_3j_m(PyObject* self, PyObject* args)
 
     wigner_3j_m(l1, l2, l3, m1, &m2min, &m2max, thrcof, n);
 
-    list = PyList_New(n);
-    for(i = 0; i < n; ++i)
-        PyList_SetItem(list, i, PyFloat_FromDouble(thrcof[i]));
+    dims[0] = n;
+    array = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, thrcof);
+    capsule = PyCapsule_New(thrcof, NULL, capsule_free);
+    PyArray_SetBaseObject((PyArrayObject*)array, capsule);
 
-    free(thrcof);
-
-    result = Py_BuildValue("ddO", m2min, m2max, list);
-
-    Py_DECREF(list);
-
-    return result;
+    return Py_BuildValue("ddN", m2min, m2max, array);
 }
 
 
@@ -139,7 +137,9 @@ static PyObject* c_wigner_d_l(PyObject* self, PyObject* args)
     int lmin, lmax, m1, m2, i, n;
     double theta;
     double* d;
-    PyObject* list;
+    npy_intp dims[1];
+    PyObject* array;
+    PyObject* capsule;
 
     if(!PyArg_ParseTuple(args, "iiiid", &lmin, &lmax, &m1, &m2, &theta))
         return NULL;
@@ -157,13 +157,12 @@ static PyObject* c_wigner_d_l(PyObject* self, PyObject* args)
 
     wigner_d_l(lmin, lmax, m1, m2, theta, d);
 
-    list = PyList_New(n);
-    for(i = 0; i < n; ++i)
-        PyList_SetItem(list, i, PyFloat_FromDouble(d[i]));
+    dims[0] = n;
+    array = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, d);
+    capsule = PyCapsule_New(d, NULL, capsule_free);
+    PyArray_SetBaseObject((PyArrayObject*)array, capsule);
 
-    free(d);
-
-    return list;
+    return array;
 }
 
 
@@ -209,7 +208,7 @@ static PyMethodDef methods[] = {
 };
 
 
-static struct PyModuleDef module = {
+static struct PyModuleDef module_def = {
     PyModuleDef_HEAD_INIT,
     "c",
     PyDoc_STR("C library bindings"),
@@ -221,5 +220,11 @@ static struct PyModuleDef module = {
 PyMODINIT_FUNC
 PyInit_c(void)
 {
-    return PyModule_Create(&module);
+    PyObject* module = PyModule_Create(&module_def);
+    if(!module)
+        return NULL;
+    import_array();
+    if(PyErr_Occurred())
+        return NULL;
+    return module;
 }

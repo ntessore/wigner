@@ -1,11 +1,12 @@
 import setuptools
+import numpy as np
 
 with open('README.rst', 'r') as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name='wigner',
-    version='0.9.4',
+    version='0.9.5',
     author='Nicolas Tessore',
     author_email='n.tessore@ucl.ac.uk',
     description='functions for rotations: Wigner D-matrix, 3j-symbols',
@@ -18,6 +19,7 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     python_requires='>=3.6',
+    install_requires=['numpy'],
     packages=['wigner'],
     package_dir={'': 'python'},
     ext_modules=[
@@ -31,6 +33,7 @@ setuptools.setup(
             ],
             include_dirs=[
                 'c',
+                np.get_include(),
             ],
         ),
     ],

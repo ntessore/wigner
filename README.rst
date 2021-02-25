@@ -5,8 +5,8 @@ wigner
 *Functions for rotations: Wigner D-matrix, 3j-symbols, more as needed.*
 
 A collection of fast numerical routines in C to compute functions associated
-with rotations and statistics on the sphere. Hand-coded and dependency-free
-Python interfaces are provided.
+with rotations and statistics on the sphere. Hand-coded Python interfaces
+depending only on numpy are provided.
 
 `Interfaces`_:
 

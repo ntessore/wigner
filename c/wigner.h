@@ -1,6 +1,6 @@
 #pragma once
 
-void legendre_p(double x, int lmin, int lmax, double* p);
+void legendre_p_l(int lmin, int lmax, double x, double* p);
 
 void wigner_d_l(int lmin, int lmax, int m1, int m2, double theta, double* d);
 

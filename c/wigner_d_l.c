@@ -38,20 +38,20 @@ static inline int binom(int n, int k)
     return b;
 }
 
-void legendre_p(double x, int n0, int n1, double* p)
+void legendre_p_l(int l0, int l1, double x, double* p)
 {
-    int n;
+    int l;
     double p0, p1 = 1, p2 = x;
-    if(0 >= n0)
+    if(0 >= l0)
         *(p++) = 1;
-    if(1 >= n0)
+    if(1 >= l0)
         *(p++) = x;
-    for(n = 2; n <= n1; ++n)
+    for(l = 2; l <= l1; ++l)
     {
         p0 = p1;
         p1 = p2;
-        p2 = ((2*n-1)*x*p1 - (n-1)*p0)/n;
-        if(n >= n0)
+        p2 = ((2*l-1)*x*p1 - (l-1)*p0)/l;
+        if(l >= l0)
             *(p++) = p2;
     }
 }
@@ -69,7 +69,7 @@ void wigner_d_l(int l0, int l1, int n, int m, double theta, double* d)
     
     if(n == 0 && m == 0)
     {
-        legendre_p(cos(theta), l0, l1, d);
+        legendre_p_l(l0, l1, cos(theta), d);
         return;
     }
     

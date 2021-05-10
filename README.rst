@@ -44,6 +44,20 @@ The ``wigner`` Python module contains low-level bindings to the C library
 Functions
 =========
 
+Legendre polynomials
+--------------------
+
+`legendre_p_l`_
+  Compute the Legendre polynomials for a range of ``l`` values.
+
+
+``legendre_p_l``
+~~~~~~~~~~~~~~~~
+
+Code to compute the Legendre polynomials for a range of ``l`` values and fixed
+argument, using the well-known recurrence.
+
+
 Wigner D-matrix
 ---------------
 

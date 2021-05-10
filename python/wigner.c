@@ -12,6 +12,40 @@ void capsule_free(PyObject* capsule)
 }
 
 
+static PyObject* c_legendre_p_l(PyObject* self, PyObject* args)
+{
+    int lmin, lmax, i, n;
+    double x;
+    double* p;
+    npy_intp dims[1];
+    PyObject* array;
+    PyObject* capsule;
+
+    if(!PyArg_ParseTuple(args, "iid", &lmin, &lmax, &x))
+        return NULL;
+
+    if(lmin < 0 || lmax < lmin)
+    {
+        PyErr_SetString(PyExc_ValueError, "requires 0 <= lmin <= lmax");
+        return NULL;
+    }
+
+    n = lmax-lmin+1;
+    p = malloc(n*sizeof(double));
+    if(!p)
+        return PyErr_NoMemory();
+
+    legendre_p_l(lmin, lmax, x, p);
+
+    dims[0] = n;
+    array = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, p);
+    capsule = PyCapsule_New(p, NULL, capsule_free);
+    PyArray_SetBaseObject((PyArrayObject*)array, capsule);
+
+    return array;
+}
+
+
 static PyObject* c_wigner_3j_l(PyObject* self, PyObject* args)
 {
     double l2, l3, m2, m3, l1min, l1max;
@@ -167,6 +201,15 @@ static PyObject* c_wigner_d_l(PyObject* self, PyObject* args)
 
 
 static PyMethodDef methods[] = {
+    {"legendre_p_l", c_legendre_p_l, METH_VARARGS, PyDoc_STR(
+        "legendre_p_l(lmin, lmax, x)\n"
+        "--\n"
+        "\n"
+        "Returns\n"
+        "-------\n"
+        "list of float\n"
+        "    Values `P_l(x)` where `l = lmin, ..., lmax`.\n"
+    )},
     {"wigner_3j_l", c_wigner_3j_l, METH_VARARGS, PyDoc_STR(
         "wigner_3j_l(l2, l3, m2, m3)\n"
         "--\n"

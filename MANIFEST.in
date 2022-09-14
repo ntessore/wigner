@@ -1,1 +1,2 @@
+include python/README.md
 include include/wigner.h

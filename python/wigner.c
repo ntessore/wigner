@@ -1,251 +1,204 @@
 #define PY_SSIZE_T_CLEAN
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
 #include "wigner.h"
 
 
-void capsule_free(PyObject* capsule)
+static PyObject* _legendre_pl(PyObject* self, PyObject* args)
 {
-    void* p = PyCapsule_GetPointer(capsule, NULL);
-    free(p);
-}
-
-
-static PyObject* c_legendre_p_l(PyObject* self, PyObject* args)
-{
-    int lmin, lmax, i, n;
+    int lmin, lmax, n;
     double x;
     double* p;
     npy_intp dims[1];
-    PyObject* array;
-    PyObject* capsule;
+    PyArrayObject* array;
 
     if(!PyArg_ParseTuple(args, "iid", &lmin, &lmax, &x))
         return NULL;
 
     if(lmin < 0 || lmax < lmin)
-    {
-        PyErr_SetString(PyExc_ValueError, "requires 0 <= lmin <= lmax");
-        return NULL;
-    }
+        return PyErr_Format(PyExc_ValueError, "requires 0 <= lmin <= lmax");
 
     n = lmax-lmin+1;
-    p = malloc(n*sizeof(double));
-    if(!p)
-        return PyErr_NoMemory();
-
-    legendre_p_l(lmin, lmax, x, p);
-
     dims[0] = n;
-    array = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, p);
-    capsule = PyCapsule_New(p, NULL, capsule_free);
-    PyArray_SetBaseObject((PyArrayObject*)array, capsule);
+    array = (PyArrayObject*)PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+    if(!array)
+        return NULL;
+    p = PyArray_DATA(array);
 
-    return array;
+    legendre_pl(lmin, lmax, x, p);
+
+    return PyArray_Return(array);
 }
 
 
-static PyObject* c_wigner_3j_l(PyObject* self, PyObject* args)
+static PyObject* _wigner_3jj(PyObject* self, PyObject* args)
 {
     double l2, l3, m2, m3, l1min, l1max;
     double* thrcof;
     int ier, n;
     npy_intp dims[1];
-    PyObject* array;
-    PyObject* capsule;
+    PyArrayObject* array;
 
     if(!PyArg_ParseTuple(args, "dddd", &l2, &l3, &m2, &m3))
         return NULL;
 
-    ier = wigner_3j_l(l2, l3, m2, m3, &l1min, &l1max, NULL, 0);
+    ier = wigner_3jj(l2, l3, m2, m3, &l1min, &l1max, NULL, 0);
 
     switch(ier)
     {
     case 0:
         break;
-
     case 1:
-        PyErr_SetString(PyExc_ValueError, "either `l2 < abs(m2)` or "
-                        "`l3 < abs(m3)");
-        return NULL;
-
+        return PyErr_Format(PyExc_ValueError, "either `l2 < abs(m2)` or `l3 < abs(m3)");
     case 2:
-        PyErr_SetString(PyExc_ValueError, "either `l2+abs(m2)` or "
-                        "`l3+abs(m3)` non-integer");
-        return NULL;
-
+        return PyErr_Format(PyExc_ValueError, "either `l2+abs(m2)` or `l3+abs(m3)` non-integer");
     case 3:
-        PyErr_SetString(PyExc_ValueError, "`l1max-l1min` not an integer");
-        return NULL;
-
+        return PyErr_Format(PyExc_ValueError, "`l1max-l1min` not an integer");
     case 4:
-        PyErr_SetString(PyExc_ValueError, "`l1max` less than `l1min`");
-        return NULL;
-
+        return PyErr_Format(PyExc_ValueError, "`l1max` less than `l1min`");
     default:
-        PyErr_SetString(PyExc_RuntimeError, "unknown error");
-        return NULL;
+        return PyErr_Format(PyExc_RuntimeError, "unknown error");
     }
 
     n = l1max-l1min+1.1;
-    thrcof = malloc(n*sizeof(double));
-    if(!thrcof)
-        return PyErr_NoMemory();
-
-    wigner_3j_l(l2, l3, m2, m3, &l1min, &l1max, thrcof, n);
-
     dims[0] = n;
-    array = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, thrcof);
-    capsule = PyCapsule_New(thrcof, NULL, capsule_free);
-    PyArray_SetBaseObject((PyArrayObject*)array, capsule);
+    array = (PyArrayObject*)PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+    if(!array)
+        return NULL;
+    thrcof = PyArray_DATA(array);
+
+    wigner_3jj(l2, l3, m2, m3, &l1min, &l1max, thrcof, n);
 
     return Py_BuildValue("ddN", l1min, l1max, array);
 }
 
 
-static PyObject* c_wigner_3j_m(PyObject* self, PyObject* args)
+static PyObject* _wigner_3jm(PyObject* self, PyObject* args)
 {
     double l1, l2, l3, m1, m2min, m2max;
     double* thrcof;
     int ier, n;
     npy_intp dims[1];
-    PyObject* array;
-    PyObject* capsule;
+    PyArrayObject* array;
 
     if(!PyArg_ParseTuple(args, "dddd", &l1, &l2, &l3, &m1))
         return NULL;
 
-    ier = wigner_3j_m(l1, l2, l3, m1, &m2min, &m2max, NULL, 0);
+    ier = wigner_3jm(l1, l2, l3, m1, &m2min, &m2max, NULL, 0);
 
     switch(ier)
     {
     case 0:
         break;
-
     case 1:
-        PyErr_SetString(PyExc_ValueError, "either `l1 < abs(m1)` or "
-                        "`l1+abs(m1)` non-integer");
-        return NULL;
-
+        return PyErr_Format(PyExc_ValueError, "either `l1 < abs(m1)` or `l1+abs(m1)` non-integer");
     case 2:
-        PyErr_SetString(PyExc_ValueError, "`abs(l1-l2) <= l3 <= l1+l2` "
-                        "not satisfied");
-        return NULL;
-
+        return PyErr_Format(PyExc_ValueError, "`abs(l1-l2) <= l3 <= l1+l2` not satisfied");
     case 3:
-        PyErr_SetString(PyExc_ValueError, "`l1+l2+l3` not an integer");
-        return NULL;
-
+        return PyErr_Format(PyExc_ValueError, "`l1+l2+l3` not an integer");
     case 4:
-        PyErr_SetString(PyExc_ValueError, "`m2max-m2min` not an integer");
-        return NULL;
-
+        return PyErr_Format(PyExc_ValueError, "`m2max-m2min` not an integer");
     case 5:
-        PyErr_SetString(PyExc_ValueError, "`m2max` less than `m2min`");
-        return NULL;
-
+        return PyErr_Format(PyExc_ValueError, "`m2max` less than `m2min`");
     default:
-        PyErr_SetString(PyExc_RuntimeError, "unknown error");
-        return NULL;
+        return PyErr_Format(PyExc_RuntimeError, "unknown error");
     }
 
     n = m2max-m2min+1.1;
-    thrcof = malloc(n*sizeof(double));
-    if(!thrcof)
-        return PyErr_NoMemory();
-
-    wigner_3j_m(l1, l2, l3, m1, &m2min, &m2max, thrcof, n);
-
     dims[0] = n;
-    array = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, thrcof);
-    capsule = PyCapsule_New(thrcof, NULL, capsule_free);
-    PyArray_SetBaseObject((PyArrayObject*)array, capsule);
+    array = (PyArrayObject*)PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+    if(!array)
+        return NULL;
+    thrcof = PyArray_DATA(array);
+
+    wigner_3jm(l1, l2, l3, m1, &m2min, &m2max, thrcof, n);
 
     return Py_BuildValue("ddN", m2min, m2max, array);
 }
 
 
-static PyObject* c_wigner_d_l(PyObject* self, PyObject* args)
+static PyObject* _wigner_dl(PyObject* self, PyObject* args)
 {
-    int lmin, lmax, m1, m2, i, n;
+    int lmin, lmax, m1, m2, n;
     double theta;
     double* d;
     npy_intp dims[1];
-    PyObject* array;
-    PyObject* capsule;
+    PyArrayObject* array;
 
     if(!PyArg_ParseTuple(args, "iiiid", &lmin, &lmax, &m1, &m2, &theta))
         return NULL;
 
     if(lmin < 0 || lmax < lmin)
-    {
-        PyErr_SetString(PyExc_ValueError, "requires 0 <= lmin <= lmax");
-        return NULL;
-    }
+        return PyErr_Format(PyExc_ValueError, "requires 0 <= lmin <= lmax");
 
     n = lmax-lmin+1;
-    d = malloc(n*sizeof(double));
-    if(!d)
-        return PyErr_NoMemory();
-
-    wigner_d_l(lmin, lmax, m1, m2, theta, d);
-
     dims[0] = n;
-    array = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, d);
-    capsule = PyCapsule_New(d, NULL, capsule_free);
-    PyArray_SetBaseObject((PyArrayObject*)array, capsule);
+    array = (PyArrayObject*)PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+    if(!array)
+        return NULL;
+    d = PyArray_DATA(array);
 
-    return array;
+    wigner_dl(lmin, lmax, m1, m2, theta, d);
+
+    return PyArray_Return(array);
 }
 
 
 static PyMethodDef methods[] = {
-    {"legendre_p_l", c_legendre_p_l, METH_VARARGS, PyDoc_STR(
-        "legendre_p_l(lmin, lmax, x)\n"
+    {"legendre_pl", _legendre_pl, METH_VARARGS, PyDoc_STR(
+        "legendre_pl(lmin, lmax, x)\n"
         "--\n"
         "\n"
-        "Returns\n"
-        "-------\n"
-        "list of float\n"
-        "    Values `P_l(x)` where `l = lmin, ..., lmax`.\n"
+        "Compute the Legendre polynomials `P_l(x)` for all degrees `l = lmin`\n"
+        "to `l = lmax`, with `x` being held fixed.  The arguments `lmin` and\n"
+        "`lmax` must be integers, while the argument `x` must be float.\n"
+        "Returns a numpy array of size `lmax-lmin+1`.\n"
     )},
-    {"wigner_3j_l", c_wigner_3j_l, METH_VARARGS, PyDoc_STR(
-        "wigner_3j_l(l2, l3, m2, m3)\n"
+    {"wigner_3jj", _wigner_3jj, METH_VARARGS, PyDoc_STR(
+        "wigner_3jj(l2, l3, m2, m3)\n"
         "--\n"
         "\n"
-        "Returns\n"
-        "-------\n"
-        "l1min : float\n"
-        "    Smallest allowable l1 in 3j symbol.\n"
-        "l1max : float\n"
-        "    Largest allowable l1 in 3j symbol.\n"
-        "thrcof : list of float\n"
-        "    Set of 3j coefficients generated by evaluating the 3j symbol\n"
-        "    for all allowed values of l1.\n"
+        "Evaluate the Wigner 3j symbol\n"
+        "\n"
+        "    /   l1    l2  l3 \\\n"
+        "    \\ -m2-m3  m2  m3 /\n"
+        "\n"
+        "for all allowable values of `l1`, with the other parameters held\n"
+        "fixed.  For physically meaningful outputs, the arguments must be\n"
+        "integer or half-integer, although other inputs are allowed.  Returns\n"
+        "a tuple `l1min, l1max, thrcof` where `l1min` and `l1max` are the\n"
+        "smallest and largest allowable values of `l1`, and `thrcof` is a \n"
+        "numpy array of size `l1max-l1min+1` containing the values of the 3j\n"
+        "symbol.\n"
     )},
-    {"wigner_3j_m", c_wigner_3j_m, METH_VARARGS, PyDoc_STR(
-        "wigner_3j_m(l1, l2, l3, m1)\n"
+    {"wigner_3jm", _wigner_3jm, METH_VARARGS, PyDoc_STR(
+        "wigner_3jm(l1, l2, l3, m1)\n"
         "--\n"
         "\n"
-        "Returns\n"
-        "-------\n"
-        "m2min : float\n"
-        "    Smallest allowable m2 in 3j symbol.\n"
-        "m2max : float\n"
-        "    Largest allowable m2 in 3j symbol.\n"
-        "thrcof : list of float\n"
-        "    Set of 3j coefficients generated by evaluating the 3j symbol\n"
-        "    for all allowed values of m2.\n"
+        "Evaluate the Wigner 3j symbol\n"
+        "\n"
+        "    / l1  l2    l3  \\\n"
+        "    \\ m1  m2  -m1-m2/\n"
+        "\n"
+        "for all allowable values of `m2`, with the other parameters held\n"
+        "fixed.  For physically meaningful outputs, the arguments must be\n"
+        "integer or half-integer, although other inputs are allowed.  Returns\n"
+        "a tuple `m2min, m2max, thrcof` where `m2min` and `m2max` are the\n"
+        "smallest and largest allowable values of `m2`, and `thrcof` is a \n"
+        "numpy array of size `m2max-m2min+1` containing the values of the 3j\n"
+        "symbol.\n"
     )},
-    {"wigner_d_l", c_wigner_d_l, METH_VARARGS, PyDoc_STR(
-        "wigner_d_l(lmin, lmax, m1, m2, theta)\n"
+    {"wigner_dl", _wigner_dl, METH_VARARGS, PyDoc_STR(
+        "wigner_dl(lmin, lmax, m1, m2, theta)\n"
         "--\n"
         "\n"
-        "Returns\n"
-        "-------\n"
-        "list of float\n"
-        "    Values `d^{l}_{m1, m2}` where `l = lmin, ..., lmax`.\n"
+        "Compute the Wigner d function `d^l_{m1,m2}(theta)` for all degrees\n"
+        "`l = lmin` to `l = lmax`, with `m1`, `m2`, and `theta` being held\n"
+        "fixed.  The arguments `lmin`, `lmax`, `m1`, `m2` must be integers,\n"
+        "and the angle `theta` must be given in radian as float.  Returns a\n"
+        "numpy array of size `lmax-lmin+1`.\n"
     )},
     {NULL, NULL}
 };
@@ -253,15 +206,15 @@ static PyMethodDef methods[] = {
 
 static struct PyModuleDef module_def = {
     PyModuleDef_HEAD_INIT,
-    "c",
-    PyDoc_STR("C library bindings"),
+    "wigner",
+    PyDoc_STR("Wigner d functions and 3j symbols"),
     -1,
     methods
 };
 
 
 PyMODINIT_FUNC
-PyInit_c(void)
+PyInit_wigner(void)
 {
     PyObject* module = PyModule_Create(&module_def);
     if(!module)

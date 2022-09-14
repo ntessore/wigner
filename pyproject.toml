@@ -1,2 +1,25 @@
 [build-system]
-requires = ["setuptools", " wheel", "numpy"]
+requires = ["setuptools>=61", "oldest-supported-numpy", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wigner"
+version = "2022.9.14"
+authors = [
+  { name="Nicolas Tessore", email="n.tessore@ucl.ac.uk" },
+]
+description = "Wigner d functions and 3j symbols"
+readme = "python/README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ntessore/wigner"

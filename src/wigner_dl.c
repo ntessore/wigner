@@ -1,9 +1,7 @@
-// wigner_d.c -- compute the Wigner d-function recursively in angular momentum
-// ----
+// compute the Wigner d-function recursively in angular momentum
+//
 // author: Nicolas Tessore <n.tessore@ucl.ac.uk>
-// versions:
-//   31 Aug 2018: initial version
-//   04 Nov 2020: packaged, code unchanged
+// date: 31 Aug 2018
 // notes:
 // - uses SSE intrinsics by default if SSE3 is detected; compile with -DNO_SSE
 //   to disable
@@ -38,25 +36,25 @@ static inline int binom(int n, int k)
     return b;
 }
 
-void legendre_p_l(int l0, int l1, double x, double* p)
+void legendre_pl(int lmin, int lmax, double x, double* p)
 {
     int l;
     double p0, p1 = 1, p2 = x;
-    if(0 >= l0)
-        *(p++) = 1;
-    if(1 >= l0)
-        *(p++) = x;
-    for(l = 2; l <= l1; ++l)
+    for(l = 2; l < lmin+2; ++l)
     {
         p0 = p1;
         p1 = p2;
         p2 = ((2*l-1)*x*p1 - (l-1)*p0)/l;
-        if(l >= l0)
-            *(p++) = p2;
     }
+    if(lmax >= lmin+0)
+        p[0] = p1;
+    if(lmax >= lmin+1)
+        p[1] = p2;
+    for(l = lmin+2; l <= lmax; ++l)
+        p[l-lmin] = ((2*l-1)*x*p[l-1-lmin] - (l-1)*p[l-2-lmin])/l;
 }
 
-void wigner_d_l(int l0, int l1, int n, int m, double theta, double* d)
+void wigner_dl(int l0, int l1, int n, int m, double theta, double* d)
 {
     double d0, u, v, x;
     int l, lp, a, b, c;
@@ -69,7 +67,7 @@ void wigner_d_l(int l0, int l1, int n, int m, double theta, double* d)
     
     if(n == 0 && m == 0)
     {
-        legendre_p_l(l0, l1, cos(theta), d);
+        legendre_pl(l0, l1, cos(theta), d);
         return;
     }
     

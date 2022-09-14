@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    wigner_d_l(l0, l1, n, m, 0.017453292519943295769*t, d);
+    wigner_dl(l0, l1, n, m, 0.017453292519943295769*t, d);
     
     printf("#    l  d^l_{%d, %d}(%g deg)\n", n, m, t);
     for(l = l0; l <= l1; ++l)

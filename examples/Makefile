@@ -16,8 +16,8 @@ all: cl_to_xi showdl
 clean:
 	$(RM) cl_to_xi showdl
 
-cl_to_xi: cl_to_xi.c ../src/wigner_d_l.c
+cl_to_xi: cl_to_xi.c ../src/wigner_dl.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -o $@ $^ $(LDLIBS)
 
-showdl: showdl.c ../src/wigner_d_l.c
+showdl: showdl.c ../src/wigner_dl.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -o $@ $^ $(LDLIBS)

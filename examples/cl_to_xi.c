@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
     {
         t = t0 + d*i;
         
-        wigner_d_l(l0, l1, m1, m2, 0.017453292519943295769*t, wd);
+        wigner_dl(l0, l1, m1, m2, 0.017453292519943295769*t, wd);
         
         x = 0;
         for(l = l0; l <= l1; ++l)

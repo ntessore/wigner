@@ -12,6 +12,7 @@ Functions
 - [***legendre_pl***](#legendre_pl) – Legendre polynomial as function of *l*
 - [***wigner_3jj***](#wigner_3jj) – Wigner 3j symbol as function of *l1*
 - [***wigner_3jm***](#wigner_3jm) – Wigner 3j symbol as function of *m2*
+- [***wigner_6j***](#wigner_6j) – Wigner 6j symbol as function of *l1*
 - [***wigner_dl***](#wigner_dl) – Wigner d function as function of *l*
 
 
@@ -89,6 +90,38 @@ can be allocated.  The function returns an error flag:
 - *6* if *ndim* less than *m2max-m2min+1*.
 
 The code is a reimplementation of the [SLATEC] routine *drc3jj* in C.
+
+
+### wigner_6j
+
+*int **wigner_6j**(double l2, double l3, double l4, double l5, double l6,
+                   double\* l1min, double\* l1max, double\* sixcof, int ndim)*
+[[source]](src/wigner_6j.c)
+
+Evaluate the Wigner 6j symbol
+
+    {l1  l2  l3}
+    {l4  l5  l6}
+
+for all allowable values of *l1*, with the other parameters held fixed.  For
+physically meaningful outputs, the arguments *l2*, *l3*, *l4*, *l5*, *l6* must
+be integer or half-integer, although other inputs are allowed.  On return,
+*l1min* and *l1max* contain the smallest and largest allowable values of *l1*,
+respectively.  The values of the 6j symbols are stored in the array pointed to
+by *sixcof*.  Its allocated size is passed as *ndim*, which must be at least
+*l1max-l1min+1*.  If *sixcof* is *NULL*, the function returns after checking
+the inputs and setting *l1min* and *l1max*, so that an array of appropriate
+size can be allocated.  The function returns an error flag:
+
+- *0* if no errors,
+- *1* if either *l2+l3+l5+l6* or *l4+l2+l6* not an integer,
+- *2* if *l4*, *l2*, *l6* triangular condition not satisfied,
+- *3* if *l4*, *l5*, *l3* triangular condition not satisfied,
+- *4* if *l1max-l1min* not an integer,
+- *5* if *l1max* less than *l1min*,
+- *6* if *ndim* less than *l1max-l1min+1*.
+
+The code is a reimplementation of the [SLATEC] routine *drc6j* in C.
 
 
 ### wigner_dl

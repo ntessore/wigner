@@ -31,6 +31,7 @@ Functions
 - [***legendre_pl***](#legendre_pl) – Legendre polynomial as function of *l*
 - [***wigner_3jj***](#wigner_3jj) – Wigner 3j symbol as function of *l1*
 - [***wigner_3jm***](#wigner_3jm) – Wigner 3j symbol as function of *m2*
+- [***wigner_6j***](#wigner_6j) – Wigner 6j symbol as function of *l1*
 - [***wigner_dl***](#wigner_dl) – Wigner d function as function of *l*
 
 
@@ -76,6 +77,23 @@ although other inputs are allowed.  Returns a tuple *m2min, m2max, thrcof* where
 *m2min* and *m2max* are the smallest and largest allowable values of *m2*, and
 *thrcof* is a numpy array of size *m2max-m2min+1* containing the values of the
 3j symbol.
+
+
+### wigner_6j
+
+***wigner_6j**(l2, l3, l4, l5, l6)*
+
+Evaluate the Wigner 6j symbol
+
+    {l1  l2  l3}
+    {l4  l5  l6}
+
+for all allowable values of *l1*, with the other parameters held fixed.  For
+physically meaningful outputs, the arguments must be integer or half-integer,
+although other inputs are allowed.  Returns a tuple *l1min, l1max, sixcof*
+where *l1min* and *l1max* are the smallest and largest allowable values of
+*l1*, and *sixcof* is a numpy array of size *l1max-l1min+1* containing the
+values of the 6j symbol.
 
 
 ### wigner_dl

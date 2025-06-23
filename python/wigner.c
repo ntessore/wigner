@@ -119,6 +119,50 @@ static PyObject* _wigner_3jm(PyObject* self, PyObject* args)
 }
 
 
+static PyObject* _wigner_6j(PyObject* self, PyObject* args)
+{
+    double l2, l3, l4, l5, l6, l1min, l1max;
+    double* sixcof;
+    int ier, n;
+    npy_intp dims[1];
+    PyArrayObject* array;
+
+    if(!PyArg_ParseTuple(args, "ddddd", &l2, &l3, &l4, &l5, &l6))
+        return NULL;
+
+    ier = wigner_6j(l2, l3, l4, l5, l6, &l1min, &l1max, NULL, 0);
+
+    switch(ier)
+    {
+    case 0:
+        break;
+    case 1:
+        return PyErr_Format(PyExc_ValueError, "either `l2+l3+l5+l6` or `l4+l2+l6` not an integer");
+    case 2:
+        return PyErr_Format(PyExc_ValueError, "`l4`, `l2`, `l6` triangular condition not satisfied");
+    case 3:
+        return PyErr_Format(PyExc_ValueError, "`l4`, `l5`, `l3` triangular condition not satisfied");
+    case 4:
+        return PyErr_Format(PyExc_ValueError, "`l1max-l1min` not an integer");
+    case 5:
+        return PyErr_Format(PyExc_ValueError, "`l1max` less than `l1min`");
+    default:
+        return PyErr_Format(PyExc_RuntimeError, "unknown error");
+    }
+
+    n = l1max-l1min+1.1;
+    dims[0] = n;
+    array = (PyArrayObject*)PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+    if(!array)
+        return NULL;
+    sixcof = PyArray_DATA(array);
+
+    wigner_6j(l2, l3, l4, l5, l6, &l1min, &l1max, sixcof, n);
+
+    return Py_BuildValue("ddN", l1min, l1max, array);
+}
+
+
 static PyObject* _wigner_dl(PyObject* self, PyObject* args)
 {
     int lmin, lmax, m1, m2, n;
@@ -190,6 +234,23 @@ static PyMethodDef methods[] = {
         "numpy array of size `m2max-m2min+1` containing the values of the 3j\n"
         "symbol.\n"
     )},
+    {"wigner_6j", _wigner_6j, METH_VARARGS, PyDoc_STR(
+        "wigner_6j(l2, l3, l4, l5, l6)\n"
+        "--\n"
+        "\n"
+        "Evaluate the Wigner 6j symbol\n"
+        "\n"
+        "    {l1  l2  l3}\n"
+        "    {l4  l5  l6}\n"
+        "\n"
+        "for all allowable values of `l1`, with the other parameters held\n"
+        "fixed.  For physically meaningful outputs, the arguments must be\n"
+        "integer or half-integer, although other inputs are allowed.  Returns\n"
+        "a tuple `l1min, l1max, sixcof` where `l1min` and `l1max` are the\n"
+        "smallest and largest allowable values of `l1`, and `sixcof` is a \n"
+        "numpy array of size `l1max-l1min+1` containing the values of the 6j\n"
+        "symbol.\n"
+    )},
     {"wigner_dl", _wigner_dl, METH_VARARGS, PyDoc_STR(
         "wigner_dl(lmin, lmax, m1, m2, theta)\n"
         "--\n"
@@ -207,7 +268,7 @@ static PyMethodDef methods[] = {
 static struct PyModuleDef module_def = {
     PyModuleDef_HEAD_INIT,
     "wigner",
-    PyDoc_STR("Wigner d functions and 3j symbols"),
+    PyDoc_STR("Wigner d functions, 3j symbols, 6j symbols"),
     -1,
     methods
 };
